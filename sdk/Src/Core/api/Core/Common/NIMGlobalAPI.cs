@@ -22,6 +22,8 @@ namespace NIM
 
     public delegate void GetCacheFileInfoDelegate(CacheFileInfo info);
 
+    public delegate void GlobalUploadSdkLogDelegate(ResponseCode code);
+
     public class GlobalAPI
     {
         /// <summary>
@@ -178,7 +180,24 @@ namespace NIM
             }
             return fileTypeStr;
         }
-        
+
+        /// <summary>
+        /// 上传SDK日志到服务器
+        /// </summary>
+        /// <param name="feedbackMessage">反馈信息</param>>
+        /// <param name="cb">nim_global_upload_sdk_log_cb_func回调函数定义见nim_global_def.h</param>
+        public static void GlobalUploadSdkLog(string feedbackMessage, GlobalUploadSdkLogDelegate cb)
+        {
+            var ptr = DelegateConverter.ConvertToIntPtr(cb);
+            NIMGlobalNativeMethods.nim_global_upload_sdk_log(feedbackMessage, GlobalUploadSdkLogCbFunc, ptr);
+        }
+
+        static nim_global_upload_sdk_log_cb_func GlobalUploadSdkLogCbFunc = OnGlobalUploadSdkLogCbFunc;
+
+        private static void OnGlobalUploadSdkLogCbFunc(ResponseCode rescode, IntPtr user_data)
+        {
+            DelegateConverter.InvokeOnce<GlobalUploadSdkLogDelegate>(user_data, rescode);
+        }
 #endif
 
     }
