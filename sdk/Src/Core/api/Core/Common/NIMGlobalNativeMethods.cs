@@ -20,6 +20,9 @@ namespace NIM
     delegate void nim_sdk_get_cache_file_info_cb_func([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaler))]string info,
         IntPtr user_data);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    delegate void nim_global_upload_sdk_log_cb_func(ResponseCode rescode, IntPtr user_data);
+
     class NIMGlobalNativeMethods
     {
         #region NIM C SDK native methods
@@ -100,6 +103,12 @@ namespace NIM
             long end_timestamp,
             [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaler))]string json_extension, 
             nim_sdk_del_cache_file_cb_func cb, 
+            IntPtr user_data);
+
+        [DllImport(NIM.NativeConfig.NIMNativeDLL, EntryPoint = "nim_global_upload_sdk_log", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void nim_global_upload_sdk_log(
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaler))] string feedback_message,
+            nim_global_upload_sdk_log_cb_func cb,
             IntPtr user_data);
 
 #endif
